@@ -1,0 +1,327 @@
+
+#mainHeader {
+  position: absolute; /* Position the whole header */
+  top: 10px;
+  left: 10px;
+  right: 10px; /* Stretch across the top */
+  z-index: 3; /* Ensure it's above canvases */
+
+  display: flex; /* Use flexbox to arrange items horizontally */
+  justify-content: flex-start; /* Align items to the start for better control with gap/margin */
+  align-items: flex-start; /* Align items to the top if they have different heights */
+  gap: 15px; /* Spacing between the main UI groups */
+  padding: 0; /* No padding on the header itself, inner divs have padding */
+}
+
+/* Ensure dropdowns within header can position themselves */
+#mainHeader > .dropdown { /* Target direct children with class .dropdown */
+    position: relative; /* Make dropdowns position relative to the header */
+    top: auto; /* Remove previous absolute positioning */
+    right: auto; /* Remove previous absolute positioning */
+}
+
+/* Adjust individual UI containers within the header */
+#ui {
+  background: rgba(255,255,255,0); /* Your transparent background */
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Add margin to #poseDropdown and #shareControls to push them to the right */
+#poseDropdown {
+    margin-left: auto; /* Pushes this and subsequent flex items to the right */
+}
+
+#shareControls {
+    /* No additional positioning needed here, it follows poseDropdown */
+}
+
+
+/* Grouping for better layout */
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Brush Size Slider */
+#brushSize {
+    width: 100px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #d9bb0d;
+    border-radius: 3px;
+    outline: none;
+    opacity: 0.8;
+    transition: opacity .2s;
+}
+
+#brushSize:hover {
+    opacity: 1;
+}
+
+#brushSize::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #333;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#brushSize::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #333;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Brush Size Visual */
+#brushSizeVisual {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: black;
+    flex-shrink: 0;
+    transition: all 0.05s ease-out;
+}
+
+
+/* Color Picker */
+.color-picker {
+    display: flex;
+    gap: 5px;
+}
+
+.color-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+#colorBlack {
+    background-color: black;
+}
+
+#colorWhite {
+    background-color: white;
+}
+
+/* Selected state for color circles */
+.color-circle.selected[data-color="black"] {
+    border-color: white; /* White stroke for black selected */
+}
+
+.color-circle.selected[data-color="white"] {
+    border-color: black;
+}
+
+/* Icon Buttons (for Undo/Clear) */
+.icon-button {
+    background: none;
+    border: none;
+    border-radius: 100%;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease-in-out;
+}
+
+.icon-button:hover {
+    transform: translateY(-1px);
+}
+
+.icon-button:active {
+    transform: translateY(0);
+}
+
+.icon-button svg {
+    width: 20px; /* Icon size */
+    height: 20px;
+}
+
+.button-group {
+    margin-left: 10px;
+}
+
+
+/* Dropdown (General styles for the dropdown trigger div - without absolute positioning) */
+.dropdown {
+  z-index: 3; /* Keep z-index for dropdowns to stack above others */
+  font-family: sans-serif;
+}
+
+#poseToggle {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  height: 40px; /* Explicit height for consistency */
+}
+
+/* New style for the text share button */
+.text-button {
+    padding: 6px 12px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 40px; /* Explicit height for consistency */
+}
+
+.text-button:hover {
+    background: #333;
+    transform: translateY(-1px);
+}
+
+.text-button:active {
+    background: #1a1a1a;
+    transform: translateY(0);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Ensure the dropdown arrow within the text-button is white */
+.text-button .dropdown-arrow {
+    stroke: white;
+}
+
+
+/* Style for the current pose image */
+.current-pose-icon {
+    width: 50px;
+    height: 28px; /* This height contributes to the 40px overall height of #poseToggle */
+    vertical-align: middle;
+}
+
+/* Style for the dropdown arrow SVG (general, used by both dropdowns) */
+.dropdown-arrow {
+    width: 16px;
+    height: 16px;
+    stroke: #333; /* Default stroke color for arrows, will be overridden by .text-button for share */
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Rotate arrow when dropdown is open */
+.dropdown.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Content (the panel that opens) */
+.dropdown-content {
+  display: none;
+  position: absolute; /* This MUST remain absolute for the panel to float */
+  right: 0; /* Position relative to the .dropdown trigger */
+  margin-top: 5px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dropdown-content .pose-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.dropdown-content .pose-btn img {
+  width: 100%;
+  display: block;
+}
+
+.dropdown.open .dropdown-content {
+  display: flex;
+}
+
+.pose-btn.selected {
+  border: 1px solid black;
+  border-radius: 4px;
+}
+
+.pose-size-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px;
+}
+
+.size-btn {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid black;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.size-btn.selected {
+  background: black;
+  color: white;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  #mainHeader {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    left: 0;
+    right: 0;
+    padding: 10px;
+  }
+
+  #ui,
+  #mainHeader > .dropdown {
+      width: 100%;
+      justify-content: center;
+  }
+
+  .dropdown-content {
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+  }
+}

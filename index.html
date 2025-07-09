@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>doodlebase</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/ui.css">
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodlebase</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/ui.css">
+</head>
+<body>
+    <header id="mainHeader">
+        <div id="ui">
+            <div class="control-group">
+                <div class="color-picker">
+                    <button id="colorBlack" class="color-circle selected" data-color="black" aria-label="Black Color"></button>
+                    <button id="colorWhite" class="color-circle" data-color="white" aria-label="White Color"></button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <input type="range" id="brushSize" min="1" max="20" value="5">
+                <div id="brushSizeVisual" class="brush-visual"></div>
+            </div>
+
+            <div class="control-group button-group">
+                <button id="undoBtn" class="icon-button" aria-label="Undo Last Stroke">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <button id="clearBtn" class="icon-button" aria-label="Clear Canvas">
+                    <svg fill="#000000" width="800px" height="800px" viewBox="-1.5 -2.5 24 24" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin" class="jam jam-refresh"><path d='M17.83 4.194l.42-1.377a1 1 0 1 1 1.913.585l-1.17 3.825a1 1 0 0 1-1.248.664l-3.825-1.17a1 1 0 1 1 .585-1.912l1.672.511A7.381 7.381 0 0 0 3.185 6.584l-.26.633a1 1 0 1 1-1.85-.758l.26-.633A9.381 9.381 0 0 1 17.83 4.194zM2.308 14.807l-.327 1.311a1 1 0 1 1-1.94-.484l.967-3.88a1 1 0 0 1 1.265-.716l3.828.954a1 1 0 0 1-.484 1.941l-1.786-.445a7.384 7.384 0 0 0 13.216-1.792 1 1 0 1 1 1.906.608 9.381 9.381 0 0 1-5.38 5.831 9.386 9.386 0 0 1-11.265-3.328z' /></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="poseDropdown" class="dropdown">
+            <button id="poseToggle" aria-expanded="false" aria-haspopup="true">
+                <img id="currentPoseImage" src="assets/poses/pose1.svg" alt="Current Eye Pose" class="current-pose-icon" />
+                <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="dropdown-content" id="poseList">
+                <div class="pose-size-buttons">
+                    <button class="size-btn" data-size="1" onclick="setSize(1)">Small</button>
+                    <button class="size-btn selected" data-size="0"  onclick="setSize(0)">Medium</button>
+                    <button class="size-btn" data-size="2"  onclick="setSize(2)">Large</button>
+                </div>
+                <button class="pose-btn selected" onclick="setPose(0)">
+                    <img src="assets/poses/pose1.svg" alt="Pose 0" />
+                </button>
+                <button class="pose-btn" onclick="setPose(1)">
+                    <img src="assets/poses/pose2.svg" alt="Pose 1" />
+                </button>
+                <button class="pose-btn" onclick="setPose(2)">
+                    <img src="assets/poses/pose3.svg" alt="Pose 2" />
+                </button>
+                <button class="pose-btn" onclick="setPose(3)">
+                    <img src="assets/poses/pose4.svg" alt="Pose 3" />
+                </button>
+            </div>
+        </div>
+
+        <div id="shareControls" class="dropdown">
+            <button id="shareBtn" class="text-button" aria-haspopup="true" aria-expanded="false" title="Share Canvas">
+                Share
+                <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="dropdown-content" id="shareOptions">
+                <button id="saveAsFileBtn" class="share-option-btn">Save as PNG</button>
+            </div>
+        </div>
+    </header>
+
+    <canvas id="drawingCanvas"></canvas>
+    <canvas id="riveCanvas"></canvas>
+
+    <script src="https://unpkg.com/@rive-app/canvas@latest"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/drawingCanvas.js"></script>
+    <script src="js/rive.js"></script>
+</body>
+</html>
