@@ -5,7 +5,7 @@ let size = 0;
 let follow = false;
 
 r = new rive.Rive({
-    src: '/assets/doodlebase.riv',
+    src: 'assets/doodlebase.riv',
     canvas: riveCanvas,
     layout: new rive.Layout({
       fit: rive.Fit.Layout,
