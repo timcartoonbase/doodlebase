@@ -1,24 +1,30 @@
+/* index.css */
 
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+@font-face {
+  font-family: 'TT Norms';
+  src: url('/TT-Norms-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
 }
 
-#drawingCanvas {
-    z-index: 2;
-    position: absolute;
-    display: block;
-    width: 100vw;
-    height: 100vh;
+html, body {  
+  font-family: 'TT Norms', sans-serif;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
+p button { font-family: 'TT Norms', sans-serif; }
+
+#drawingCanvas,
 #riveCanvas {
-    z-index: 1;
-    position: absolute;
-    display: block;
-    width: 100vw;
-    height: 100vh;
+  position: absolute;
+  display: block;
+  width: 100vw;
+  height: 100vh;
 }
+
+#drawingCanvas { z-index: 2; }
+#riveCanvas { z-index: 1; }
