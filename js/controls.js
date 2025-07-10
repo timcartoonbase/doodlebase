@@ -10,6 +10,8 @@ const shareOptions = document.getElementById("shareOptions");
 const shareControls = document.getElementById("shareControls");
 const saveAsFileBtn = document.getElementById("saveAsFileBtn");
 const copyToClipboardBtn = document.getElementById("copyToClipboardBtn");
+const copyBtn2 = document.getElementById("copyToClipboardBtn2");
+const saveBtn2 = document.getElementById("saveAsFileBtn2");
 
 const posButtons = document.querySelectorAll(".pos-btn");
 
@@ -168,7 +170,7 @@ shareBtn.addEventListener("click", (e) => {
   poseToggle.setAttribute("aria-expanded", "false");
 });
 
-saveAsFileBtn.addEventListener("click", () => {
+function saveCanvasAsPNG() {
   const dataURL = getCombinedCanvasDataURL();
   if (dataURL) {
     const a = document.createElement("a");
@@ -180,9 +182,11 @@ saveAsFileBtn.addEventListener("click", () => {
   } else {
     alert("Could not generate image.");
   }
-});
+}
 
-copyToClipboardBtn.addEventListener("click", async () => {
+saveAsFileBtn.addEventListener("click", saveCanvasAsPNG);
+
+async function copyCanvasToClipboard() {
   const width = window.innerWidth,
     height = window.innerHeight;
   const compositeCanvas = document.createElement("canvas");
@@ -225,6 +229,13 @@ copyToClipboardBtn.addEventListener("click", async () => {
     console.error("Clipboard error:", err);
     alert("Copy failed.");
   }
+}
+
+copyToClipboardBtn.addEventListener("click", copyCanvasToClipboard);
+copyBtn2?.addEventListener("click", copyCanvasToClipboard);
+
+saveBtn2?.addEventListener("click", () => {
+  saveCanvasAsPNG();
 });
 
 function showSnackbar(msg = "Copied!") {
