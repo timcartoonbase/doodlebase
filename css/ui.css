@@ -136,6 +136,14 @@
     border-color: black;
 }
 
+.bg-black {
+    background-color: black;
+}
+
+.bg-white {
+    background-color: white;
+}
+
 /* Icon Buttons (for Undo/Clear) */
 .icon-button {
     background: none;
@@ -303,7 +311,7 @@
 }
 
 /* Media Queries for Responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 570px) {
   #mainHeader {
     flex-direction: column;
     align-items: center;
@@ -324,4 +332,27 @@
       transform: translateX(-50%);
       right: auto;
   }
+}
+
+.snackbar {
+  visibility: hidden;
+  min-width: 220px;
+  background-color: #323232;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 12px 20px;
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  z-index: 1000;
+}
+
+.snackbar.show {
+  visibility: visible;
+  opacity: 1;
 }

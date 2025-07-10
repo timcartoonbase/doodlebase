@@ -21,9 +21,9 @@ r = new rive.Rive({
         window.riveInputs = r.stateMachineInputs("State Machine 1");
 
         // Access the inputs
-        window.pose = window.riveInputs.find(i => i.name === 'pose');
-        window.size = window.riveInputs.find(i => i.name === 'size');
-        window.follow = window.riveInputs.find(i => i.name === 'follow');
+        pose = window.riveInputs.find(i => i.name === 'pose');
+        size = window.riveInputs.find(i => i.name === 'size');
+        follow = window.riveInputs.find(i => i.name === 'follow');
 
     
     },

@@ -8,15 +8,6 @@
     <link rel="stylesheet" href="css/ui.css">
     <link rel="icon" href="public/favicon.svg" type="image/svg+xml" sizes="any">
 </head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doodlebase</title>
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/ui.css">
-</head>
 <body>
     <header id="mainHeader">
         <div id="ui">
@@ -81,13 +72,16 @@
                 </svg>
             </button>
             <div class="dropdown-content" id="shareOptions">
-                <button id="saveAsFileBtn" class="share-option-btn">Save as PNG</button>
+                <button id="copyToClipboardBtn" class="size-btn">Copy to Clipboard</button>
+                <button id="saveAsFileBtn" class="size-btn">Save as PNG</button>
             </div>
+
         </div>
     </header>
 
     <canvas id="drawingCanvas"></canvas>
     <canvas id="riveCanvas"></canvas>
+    <div id="copySnackbar" class="snackbar">✅ Copied to clipboard!</div>
 
     <script src="https://unpkg.com/@rive-app/canvas@latest"></script>
     <script src="js/ui.js"></script>

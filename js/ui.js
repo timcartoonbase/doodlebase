@@ -13,10 +13,10 @@ const clearBtn = document.getElementById("clearBtn");
 // Share Button Elements
 const shareBtn = document.getElementById("shareBtn");
 const shareOptions = document.getElementById("shareOptions");
-// We need a reference to the parent div for share options: #shareControls
-const shareControls = document.getElementById("shareControls"); // <--- NEW REFERENCE
+const saveAsFileBtn = document.getElementById("saveAsFileBtn");
+const shareControls = document.getElementById("shareControls"); // Reference to dropdown parent
 
-// Global variables for drawingCanvas.js to access
+// Global drawing state
 window.brushColor = "black";
 window.brushSize = 5;
 
@@ -26,8 +26,8 @@ poseToggle.addEventListener("click", () => {
   const isExpanded = poseDropdown.classList.contains("open");
   poseToggle.setAttribute("aria-expanded", isExpanded);
 
-  // Close other dropdowns if open
-  shareControls.classList.remove("open"); // <--- USE shareControls HERE
+  // Close share dropdown
+  shareControls.classList.remove("open");
   shareBtn.setAttribute("aria-expanded", "false");
 });
 
@@ -38,12 +38,12 @@ poseButtons.forEach((btn, index) => {
 
     const imgElement = btn.querySelector('img');
     if (imgElement && currentPoseImage) {
-        currentPoseImage.src = imgElement.src;
-        currentPoseImage.alt = imgElement.alt;
+      currentPoseImage.src = imgElement.src;
+      currentPoseImage.alt = imgElement.alt;
     }
 
     if (window.setPose) {
-        window.setPose(index);
+      window.setPose(index);
     }
 
     poseDropdown.classList.remove("open");
@@ -60,38 +60,37 @@ sizeButtons.forEach(btn => {
 
     const sizeValue = parseInt(btn.dataset.size, 10);
     if (window.setSize) {
-        window.setSize(sizeValue);
+      window.setSize(sizeValue);
     }
   });
 });
 
-// Close dropdowns when clicking outside
+// Close dropdowns on outside click
 document.addEventListener("click", (e) => {
   if (!poseDropdown.contains(e.target)) {
     poseDropdown.classList.remove("open");
     poseToggle.setAttribute("aria-expanded", "false");
   }
-  // This needs to check the parent shareControls, not the child shareOptions
-  if (!shareControls.contains(e.target) && e.target !== shareBtn) { // <--- USE shareControls HERE
-    shareControls.classList.remove("open"); // <--- USE shareControls HERE
+
+  if (!shareControls.contains(e.target) && e.target !== shareBtn) {
+    shareControls.classList.remove("open");
     shareBtn.setAttribute("aria-expanded", "false");
   }
 });
 
 // --- Brush Size Control ---
-
 function updateBrushSizeVisual() {
-    const minVisualSize = 8;
-    const maxVisualSize = 40;
-    const minBrushRange = 1;
-    const maxBrushRange = 20;
+  const minVisualSize = 8;
+  const maxVisualSize = 40;
+  const minBrushRange = 1;
+  const maxBrushRange = 20;
 
-    const scaledSize = minVisualSize +
-        ((window.brushSize - minBrushRange) / (maxBrushRange - minBrushRange)) * (maxVisualSize - minVisualSize);
+  const scaledSize = minVisualSize +
+    ((window.brushSize - minBrushRange) / (maxBrushRange - minBrushRange)) * (maxVisualSize - minVisualSize);
 
-    brushSizeVisual.style.width = `${scaledSize}px`;
-    brushSizeVisual.style.height = `${scaledSize}px`;
-    brushSizeVisual.style.backgroundColor = window.brushColor;
+  brushSizeVisual.style.width = `${scaledSize}px`;
+  brushSizeVisual.style.height = `${scaledSize}px`;
+  brushSizeVisual.style.backgroundColor = window.brushColor;
 }
 
 brushSizeSlider.addEventListener("input", (e) => {
@@ -100,127 +99,166 @@ brushSizeSlider.addEventListener("input", (e) => {
 });
 
 // --- Color Picker ---
-
 function selectColor(color) {
-    window.brushColor = color;
+  window.brushColor = color;
 
-    colorBlackBtn.classList.remove("selected");
-    colorWhiteBtn.classList.remove("selected");
+  colorBlackBtn.classList.remove("selected");
+  colorWhiteBtn.classList.remove("selected");
 
-    if (color === "black") {
-        colorBlackBtn.classList.add("selected");
-    } else if (color === "white") {
-        colorWhiteBtn.classList.add("selected");
-    }
+  if (color === "black") {
+    colorBlackBtn.classList.add("selected");
+  } else if (color === "white") {
+    colorWhiteBtn.classList.add("selected");
+  }
 
-    updateBrushSizeVisual();
+  updateBrushSizeVisual();
 }
 
 colorBlackBtn.addEventListener("click", () => selectColor("black"));
 colorWhiteBtn.addEventListener("click", () => selectColor("white"));
 
-// --- Undo and Clear Buttons ---
-
+// --- Undo and Clear ---
 undoBtn.addEventListener("click", () => {
-    if (window.undoLastStroke) {
-        window.undoLastStroke();
-    }
+  if (window.undoLastStroke) {
+    window.undoLastStroke();
+  }
 });
 
 clearBtn.addEventListener("click", () => {
-    if (window.clearDrawingCanvas) {
-        window.clearDrawingCanvas();
-    }
+  if (window.clearDrawingCanvas) {
+    window.clearDrawingCanvas();
+  }
 });
 
 // --- Share Functionality ---
-
-// Helper function to combine canvases and get data URL
 function getCombinedCanvasDataURL() {
-    const riveCanvas = document.getElementById("riveCanvas");
-    const drawingCanvas = document.getElementById("drawingCanvas");
+  const riveCanvas = document.getElementById("riveCanvas");
+  const drawingCanvas = document.getElementById("drawingCanvas");
 
-    if (!riveCanvas || !drawingCanvas) {
-        console.error("Canvases not found for sharing.");
-        return null;
-    }
+  if (!riveCanvas || !drawingCanvas) {
+    console.error("Canvases not found for sharing.");
+    return null;
+  }
 
-    // Use window.innerWidth/Height for the composite canvas,
-    // as both riveCanvas and drawingCanvas should now be set to these dimensions internally.
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
-    const compositeCanvas = document.createElement("canvas");
-    compositeCanvas.width = width;
-    compositeCanvas.height = height;
-    const compositeCtx = compositeCanvas.getContext("2d");
+  const compositeCanvas = document.createElement("canvas");
+  compositeCanvas.width = width;
+  compositeCanvas.height = height;
+  const compositeCtx = compositeCanvas.getContext("2d");
 
-    // Diagnostic logs (KEEP THESE FOR TESTING!)
-    console.log("--- Combining Canvases ---");
-    console.log("Window Dimensions:", width, height);
-    console.log("Rive Canvas Internal:", riveCanvas.width, riveCanvas.height);
-    console.log("Drawing Canvas Internal:", drawingCanvas.width, drawingCanvas.height);
-    console.log("--------------------------");
+  compositeCtx.drawImage(
+    riveCanvas,
+    0, 0, riveCanvas.width, riveCanvas.height,
+    0, 0, width, height
+  );
 
-    compositeCtx.drawImage(
-        riveCanvas,
-        0, 0, riveCanvas.width, riveCanvas.height, // Source rectangle (entire Rive internal canvas)
-        0, 0, width, height // Destination rectangle (entire composite canvas)
-    );
+  compositeCtx.drawImage(
+    drawingCanvas,
+    0, 0, drawingCanvas.width, drawingCanvas.height,
+    0, 0, width, height
+  );
 
-    compositeCtx.drawImage(
-        drawingCanvas,
-        0, 0, drawingCanvas.width, drawingCanvas.height, // Source rectangle (entire Drawing internal canvas)
-        0, 0, width, height // Destination rectangle (entire composite canvas)
-    );
-
-    return compositeCanvas.toDataURL("image/png");
+  return compositeCanvas.toDataURL("image/png");
 }
 
-
-// Share button toggle (opens the dropdown with "Save as PNG")
 shareBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    shareControls.classList.toggle("open"); // <--- USE shareControls HERE
-    const isExpanded = shareControls.classList.contains("open"); // <--- USE shareControls HERE
-    shareBtn.setAttribute("aria-expanded", isExpanded);
+  shareControls.classList.toggle("open");
+  const isExpanded = shareControls.classList.contains("open");
+  shareBtn.setAttribute("aria-expanded", isExpanded);
 
-    // Close other dropdowns if open
-    poseDropdown.classList.remove("open");
-    poseToggle.setAttribute("aria-expanded", "false");
+  poseDropdown.classList.remove("open");
+  poseToggle.setAttribute("aria-expanded", "false");
 });
 
-// Save as File Button (initiates the download)
 saveAsFileBtn.addEventListener("click", () => {
-    shareControls.classList.remove("open"); // <--- USE shareControls HERE
-    shareBtn.setAttribute("aria-expanded", "false");
+  shareControls.classList.remove("open");
+  shareBtn.setAttribute("aria-expanded", "false");
 
-    const dataURL = getCombinedCanvasDataURL();
-    if (dataURL) {
-        const a = document.createElement("a");
-        a.href = dataURL;
-        a.download = "doodlebase-creation.png";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        alert("Could not generate image for download. Please try again.");
-    }
+  const dataURL = getCombinedCanvasDataURL();
+  if (dataURL) {
+    const a = document.createElement("a");
+    a.href = dataURL;
+    a.download = "doodlebase-creation.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    alert("Could not generate image for download. Please try again.");
+  }
 });
 
+// --- Snackbar for Clipboard Feedback ---
+function showSnackbar(message = "Copied to clipboard!") {
+  const snackbar = document.getElementById("copySnackbar");
+  if (!snackbar) return;
 
-// Initial setup when the page loads
-document.addEventListener("DOMContentLoaded", () => {
-    const initialPoseBtn = document.querySelector('.pose-btn.selected');
-    if (initialPoseBtn) {
-        const imgElement = initialPoseBtn.querySelector('img');
-        if (imgElement && currentPoseImage) {
-            currentPoseImage.src = imgElement.src;
-            currentPoseImage.alt = imgElement.alt;
-        }
+  snackbar.textContent = message;
+  snackbar.classList.add("show");
+
+  setTimeout(() => {
+    snackbar.classList.remove("show");
+  }, 3000);
+}
+
+// --- Copy to Clipboard ---
+const copyToClipboardBtn = document.getElementById("copyToClipboardBtn");
+
+copyToClipboardBtn.addEventListener("click", async () => {
+  const riveCanvas = document.getElementById("riveCanvas");
+  const drawingCanvas = document.getElementById("drawingCanvas");
+
+  if (!riveCanvas || !drawingCanvas) {
+    alert("Canvases not found for copying.");
+    return;
+  }
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const compositeCanvas = document.createElement("canvas");
+  compositeCanvas.width = width;
+  compositeCanvas.height = height;
+  const compositeCtx = compositeCanvas.getContext("2d");
+
+  compositeCtx.fillStyle = "#ffffff";
+  compositeCtx.fillRect(0, 0, width, height);
+
+  compositeCtx.drawImage(riveCanvas, 0, 0, riveCanvas.width, riveCanvas.height, 0, 0, width, height);
+  compositeCtx.drawImage(drawingCanvas, 0, 0, drawingCanvas.width, drawingCanvas.height, 0, 0, width, height);
+
+  try {
+    const blob = await new Promise(resolve => compositeCanvas.toBlob(resolve, "image/png"));
+    if (!blob) {
+      alert("Failed to generate image from canvas.");
+      return;
     }
 
-    updateBrushSizeVisual();
-    selectColor(window.brushColor);
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/png": blob })
+    ]);
+
+    showSnackbar("✅ Copied to clipboard!");
+  } catch (err) {
+    console.error("Copy to clipboard failed:", err);
+    alert("Copy failed. Your browser may not support copying images.");
+  }
+});
+
+// --- Initial Page Setup ---
+document.addEventListener("DOMContentLoaded", () => {
+  const initialPoseBtn = document.querySelector('.pose-btn.selected');
+  if (initialPoseBtn) {
+    const imgElement = initialPoseBtn.querySelector('img');
+    if (imgElement && currentPoseImage) {
+      currentPoseImage.src = imgElement.src;
+      currentPoseImage.alt = imgElement.alt;
+    }
+  }
+
+  updateBrushSizeVisual();
+  selectColor(window.brushColor);
 });
