@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'TT Norms';
-  src: url('/doodlebase/TT-Norms-Medium.ttf') format('truetype');
+  src: url('/doodlebase/public/TT-Norms-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
 }
