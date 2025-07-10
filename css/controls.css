@@ -21,6 +21,12 @@
   opacity: 0.8;
   transition: opacity 0.2s;
 }
+
+@media (max-width: 570px) {
+  #brushSize {
+    width: 60px;
+  }
+}
 #brushSize:hover { opacity: 1; }
 
 #brushSize::-webkit-slider-thumb,
