@@ -1,10 +1,13 @@
-/* index.css */
-
 @font-face {
   font-family: 'TT Norms';
-  src: url('/doodlebase/public/TT-Norms-Medium.ttf') format('truetype');
+  src: url('/assets/TT-Norms-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
+}
+
+button { 
+  font-family: 'TT Norms', sans-serif; 
+  font-size: 1.05em;
 }
 
 html, body {  
@@ -15,8 +18,6 @@ html, body {
   height: 100%;
   overflow: hidden;
 }
-
-p button { font-family: 'TT Norms', sans-serif; }
 
 #drawingCanvas,
 #riveCanvas {
