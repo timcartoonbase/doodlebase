@@ -27,7 +27,9 @@
     width: 60px;
   }
 }
-#brushSize:hover { opacity: 1; }
+#brushSize:hover {
+  opacity: 1;
+}
 
 #brushSize::-webkit-slider-thumb,
 #brushSize::-moz-range-thumb {
@@ -65,14 +67,26 @@
   transition: border-color 0.2s;
 }
 
-#colorBlack { background: black; }
-#colorWhite { background: white; }
+#colorBlack {
+  background: black;
+}
+#colorWhite {
+  background: white;
+}
 
-.color-circle.selected[data-color="black"] { border-color: white; }
-.color-circle.selected[data-color="white"] { border-color: black; }
+.color-circle.selected[data-color="black"] {
+  border-color: white;
+}
+.color-circle.selected[data-color="white"] {
+  border-color: black;
+}
 
-.bg-black { background: black; }
-.bg-white { background: white; }
+.bg-black {
+  background: black;
+}
+.bg-white {
+  background: white;
+}
 
 /* Buttons */
 .icon-button {
@@ -87,8 +101,12 @@
   transition: transform 0.1s;
 }
 
-.icon-button:hover { transform: translateY(-1px); }
-.icon-button:active { transform: translateY(0); }
+.icon-button:hover {
+  transform: translateY(-1px);
+}
+.icon-button:active {
+  transform: translateY(0);
+}
 
 .icon-button svg {
   width: 20px;
@@ -97,6 +115,16 @@
 
 .button-group {
   margin-left: 10px;
+}
+
+#textInputOverlay {
+  position: absolute;
+  font-size: 20px;
+  border: none;
+  background: transparent;
+  color: black;
+  outline: none;
+  pointer-events: auto;
 }
 
 .text-button {
@@ -115,7 +143,10 @@
   transition: background 0.2s, transform 0.1s;
 }
 
-.text-button:hover { background: #333; transform: translateY(-1px); }
+.text-button:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
 .text-button:active {
   background: #1a1a1a;
   transform: translateY(0);

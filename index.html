@@ -39,6 +39,10 @@
           <div id="brushSizeVisual" class="brush-visual"></div>
         </div>
 
+        <div class="control-group">
+          <button id="textToolBtn">T</button>
+        </div>
+
         <div class="control-group button-group">
           <button
             id="undoBtn"
@@ -338,6 +342,14 @@
     <canvas id="drawingCanvas"></canvas>
     <canvas id="riveCanvas"></canvas>
     <div id="copySnackbar" class="snackbar">✅ Copied to clipboard!</div>
+    <div id="textInputWrapper" style="position: absolute; display: none">
+      <input
+        type="text"
+        id="canvasTextInput"
+        placeholder="Type text..."
+        style="font-size: 16px; padding: 4px"
+      />
+    </div>
 
     <script src="https://unpkg.com/@rive-app/canvas@latest"></script>
     <script src="js/controls.js"></script>
