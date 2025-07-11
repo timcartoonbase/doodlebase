@@ -184,9 +184,29 @@ function getHandleAt(x, y) {
 }
 
 // Tool UI
-document.querySelector("#textToolBtn").addEventListener("click", () => {
-  isTextToolActive = true;
-  drawCanvas.style.cursor = "text";
+const textToolBtn = document.querySelector("#textToolBtn");
+
+textToolBtn.addEventListener("click", () => {
+  isTextToolActive = !isTextToolActive;
+  if (isTextToolActive) {
+    drawCanvas.style.cursor = "text";
+    textToolBtn.style.border = "2px solid black";
+    textToolBtn.style.background = "#d9bb0d";
+  } else {
+    drawCanvas.style.cursor = "crosshair";
+    textToolBtn.style.border = "none";
+    textToolBtn.style.background = "none";
+  }
+});
+
+// Remove active styling when another tool is selected
+document.querySelectorAll(".color-circle").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    isTextToolActive = false;
+    drawCanvas.style.cursor = "crosshair";
+    textToolBtn.style.border = "none";
+    textToolBtn.style.background = "none";
+  });
 });
 
 document.querySelectorAll(".color-circle").forEach((btn) => {
