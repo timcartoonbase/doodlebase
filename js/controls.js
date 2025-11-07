@@ -34,12 +34,9 @@ posButtons.forEach((btn) => {
     // Add .selected to the clicked button
     btn.classList.add("selected");
 
-    // Optional: Access selected position
+    // Access selected position
     const selectedPosition = btn.dataset.pos;
     console.log("Selected position:", selectedPosition);
-
-    // If you want to update a Rive input later, do it here
-    // window.setRivePosition?.(selectedPosition);
   });
 });
 

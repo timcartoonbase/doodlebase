@@ -1,4 +1,7 @@
 const drawCanvas = document.getElementById("drawingCanvas");
+drawCanvas.style.touchAction = "none"; // Disable panning/zoom
+document.body.style.overscrollBehavior = "none"; // Disable browser gestures
+
 const ctx = drawCanvas.getContext("2d");
 
 let drawing = false;
@@ -34,6 +37,7 @@ function resizeCanvases() {
 function redraw() {
   ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
 
+  // Draw strokes
   for (const path of paths) {
     for (let i = 1; i < path.length; i++) {
       const a = path[i - 1];
@@ -48,87 +52,17 @@ function redraw() {
     }
   }
 
+  // Draw text if any
   if (textData) {
     drawText(textData);
     if (isTextToolActive) drawBoundingBox(textData);
   }
 }
 
-// === Mouse Events ===
-drawCanvas.addEventListener("mousedown", (e) => {
-  const { offsetX: x, offsetY: y } = e;
-
-  if (isTextToolActive) {
-    const handle = getHandleAt(x, y);
-    if (handle) {
-      selectedHandle = handle;
-      isDraggingText = true;
-      return;
-    }
-
-    if (textData && isInsideBox(x, y, textData)) {
-      isDraggingText = true;
-      textData.offsetX = x - textData.x;
-      textData.offsetY = y - textData.y;
-    } else {
-      const text = prompt("Enter text:");
-      if (text) {
-        const height = 40;
-        const padding = TEXT_BOX_PADDING * 2;
-        const fontSize = height - padding;
-
-        ctx.font = `${fontSize}px sans-serif`;
-        const textWidth = ctx.measureText(text).width + padding;
-
-        textData = {
-          text,
-          x,
-          y,
-          width: textWidth,
-          height,
-          fontSize,
-        };
-        redraw(); // show immediately
-      }
-    }
-  } else {
-    drawing = true;
-    currentPath = [];
-    paths.push(currentPath);
-    draw({ offsetX: x, offsetY: y });
-  }
-});
-
-drawCanvas.addEventListener("mousemove", (e) => {
-  const { offsetX: x, offsetY: y } = e;
-
-  if (drawing) {
-    draw(e);
-  }
-
-  if (isDraggingText && textData) {
-    if (selectedHandle) {
-      textData.width = Math.max(30, x - textData.x);
-      textData.height = Math.max(20, y - textData.y);
-      textData.fontSize = textData.height - TEXT_BOX_PADDING * 2;
-    } else {
-      textData.x = x - textData.offsetX;
-      textData.y = y - textData.offsetY;
-    }
-    redraw();
-  }
-});
-
-drawCanvas.addEventListener("mouseup", () => {
-  drawing = false;
-  isDraggingText = false;
-  selectedHandle = null;
-});
-
-// Drawing line segments
-function draw(e) {
-  const x = e.offsetX;
-  const y = e.offsetY;
+// Draw line segments
+function draw({ offsetX, offsetY }) {
+  const x = offsetX;
+  const y = offsetY;
   currentPath.push({ x, y, color: window.brushColor, size: window.brushSize });
 
   ctx.strokeStyle = window.brushColor;
@@ -146,6 +80,69 @@ function draw(e) {
   ctx.stroke();
 }
 
+// === Unified Pointer Events (Mouse + Touch + Stylus) ===
+drawCanvas.addEventListener("pointerdown", (e) => {
+  const rect = drawCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  drawCanvas.setPointerCapture(e.pointerId);
+
+  if (isTextToolActive) {
+    const handle = getHandleAt(x, y);
+    if (handle) {
+      selectedHandle = handle;
+      isDraggingText = true;
+      return;
+    }
+
+    if (textData && isInsideBox(x, y, textData)) {
+      isDraggingText = true;
+      textData.offsetX = x - textData.x;
+      textData.offsetY = y - textData.y;
+    } else {
+      showTextInput(x, y);
+    }
+  } else {
+    drawing = true;
+    currentPath = [];
+    paths.push(currentPath);
+    draw({ offsetX: x, offsetY: y });
+  }
+
+  e.preventDefault();
+});
+
+drawCanvas.addEventListener("pointermove", (e) => {
+  const rect = drawCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  if (drawing) {
+    draw({ offsetX: x, offsetY: y });
+  }
+
+  if (isDraggingText && textData) {
+    if (selectedHandle) {
+      textData.width = Math.max(30, x - textData.x);
+      textData.height = Math.max(20, y - textData.y);
+      textData.fontSize = textData.height - TEXT_BOX_PADDING * 2;
+    } else {
+      textData.x = x - textData.offsetX;
+      textData.y = y - textData.offsetY;
+    }
+    redraw();
+  }
+
+  e.preventDefault();
+});
+
+drawCanvas.addEventListener("pointerup", () => {
+  drawing = false;
+  isDraggingText = false;
+  selectedHandle = null;
+});
+
+// === Text drawing and bounding ===
 function drawText({ text, x, y, width, height, fontSize }) {
   fontSize = height - TEXT_BOX_PADDING * 2;
   ctx.font = `${fontSize}px sans-serif`;
@@ -183,7 +180,52 @@ function getHandleAt(x, y) {
   return null;
 }
 
-// Tool UI
+// === Text input overlay ===
+function showTextInput(x, y) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Type here...";
+  input.style.position = "absolute";
+  input.style.left = `${x}px`;
+  input.style.top = `${y}px`;
+  input.style.font = "20px sans-serif";
+  input.style.border = "1px solid #aaa";
+  input.style.padding = "4px";
+  input.style.borderRadius = "4px";
+  input.style.zIndex = 1000;
+  input.style.color = "#000";
+  input.style.background = "rgba(255,255,255,0.9)";
+
+  document.body.appendChild(input);
+  input.focus();
+
+  const finalizeText = () => {
+    const text = input.value.trim();
+    if (text) {
+      const fontSize = 20;
+      const padding = TEXT_BOX_PADDING * 2;
+      ctx.font = `${fontSize}px sans-serif`;
+      const textWidth = ctx.measureText(text).width + padding;
+      textData = {
+        text,
+        x,
+        y,
+        width: textWidth,
+        height: fontSize + padding,
+        fontSize,
+      };
+      redraw();
+    }
+    input.remove();
+  };
+
+  input.addEventListener("blur", finalizeText);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") finalizeText();
+  });
+}
+
+// === Tool UI ===
 const textToolBtn = document.querySelector("#textToolBtn");
 
 textToolBtn.addEventListener("click", () => {
@@ -219,7 +261,7 @@ document.querySelectorAll(".color-circle").forEach((btn) => {
       .forEach((b) => b.classList.remove("selected"));
     btn.classList.add("selected");
 
-    if (textData) textData = { ...textData }; // finalize
+    if (textData) textData = { ...textData };
     redraw();
   });
 });
