@@ -241,6 +241,7 @@ async function copyCanvasToClipboard(maxWidth = 1200) {
   const width = window.innerWidth;
   const height = window.innerHeight;
 
+  // Create composite canvas
   const compositeCanvas = document.createElement("canvas");
   compositeCanvas.width = width;
   compositeCanvas.height = height;
@@ -274,14 +275,10 @@ async function copyCanvasToClipboard(maxWidth = 1200) {
   // Scale down if necessary
   let scale = 1;
   if (width > maxWidth) scale = maxWidth / width;
-  const scaledWidth = width * scale;
-  const scaledHeight = height * scale;
-
   const scaledCanvas = document.createElement("canvas");
-  scaledCanvas.width = scaledWidth;
-  scaledCanvas.height = scaledHeight;
+  scaledCanvas.width = width * scale;
+  scaledCanvas.height = height * scale;
   const scaledCtx = scaledCanvas.getContext("2d");
-
   scaledCtx.drawImage(
     compositeCanvas,
     0,
@@ -290,38 +287,63 @@ async function copyCanvasToClipboard(maxWidth = 1200) {
     height,
     0,
     0,
-    scaledWidth,
-    scaledHeight
+    scaledCanvas.width,
+    scaledCanvas.height
   );
 
-  try {
-    const blob = await new Promise((res) =>
-      scaledCanvas.toBlob(res, "image/png")
-    );
+  const blob = await new Promise((res) =>
+    scaledCanvas.toBlob(res, "image/png")
+  );
 
-    // Attempt to copy image to clipboard
-    if (navigator.clipboard && window.ClipboardItem) {
+  // Try normal clipboard first
+  if (navigator.clipboard && window.ClipboardItem) {
+    try {
       await navigator.clipboard.write([
         new ClipboardItem({ "image/png": blob }),
       ]);
       showSnackbar("✅ Copied to clipboard!");
-    } else {
-      throw new Error("Clipboard API not supported.");
+      return;
+    } catch (err) {
+      console.warn("Clipboard API failed:", err);
     }
-  } catch (err) {
-    console.warn("Clipboard copy failed, using fallback:", err);
-
-    // Fallback: trigger image download instead
-    const dataURL = scaledCanvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = dataURL;
-    a.download = "doodlebase-creation.png";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    showSnackbar("⚠️ Copied failed, image downloaded instead.");
   }
+
+  // Safari / iOS fallback using Web Share API
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (
+    isIOS &&
+    navigator.canShare &&
+    navigator.canShare({
+      files: [
+        new File([blob], "doodlebase-creation.png", { type: "image/png" }),
+      ],
+    })
+  ) {
+    try {
+      await navigator.share({
+        files: [
+          new File([blob], "doodlebase-creation.png", { type: "image/png" }),
+        ],
+        title: "Doodlebase Creation",
+      });
+      showSnackbar("✅ Share sheet opened!");
+      return;
+    } catch (err) {
+      console.warn("Web Share failed:", err);
+    }
+  }
+
+  // Fallback for any other cases: download
+  const dataURL = scaledCanvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = dataURL;
+  a.download = "doodlebase-creation.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  showSnackbar("⚠️ Clipboard not supported, image downloaded instead.");
 }
 
 copyToClipboardBtn.addEventListener("click", copyCanvasToClipboard);
