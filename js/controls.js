@@ -167,25 +167,11 @@ shareBtn.addEventListener("click", (e) => {
   poseToggle.setAttribute("aria-expanded", "false");
 });
 
-function saveCanvasAsPNG() {
-  const dataURL = getCombinedCanvasDataURL();
-  if (dataURL) {
-    const a = document.createElement("a");
-    a.href = dataURL;
-    a.download = "doodlebase-creation.png";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  } else {
-    alert("Could not generate image.");
-  }
-}
+function saveCanvasAsPNG(maxWidth = 1200) {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
-saveAsFileBtn.addEventListener("click", saveCanvasAsPNG);
-
-async function copyCanvasToClipboard() {
-  const width = window.innerWidth,
-    height = window.innerHeight;
+  // Create composite canvas
   const compositeCanvas = document.createElement("canvas");
   compositeCanvas.width = width;
   compositeCanvas.height = height;
@@ -216,15 +202,125 @@ async function copyCanvasToClipboard() {
     height
   );
 
+  // Scale down if necessary
+  let scale = 1;
+  if (width > maxWidth) scale = maxWidth / width;
+  const scaledWidth = width * scale;
+  const scaledHeight = height * scale;
+
+  const scaledCanvas = document.createElement("canvas");
+  scaledCanvas.width = scaledWidth;
+  scaledCanvas.height = scaledHeight;
+  const scaledCtx = scaledCanvas.getContext("2d");
+
+  scaledCtx.drawImage(
+    compositeCanvas,
+    0,
+    0,
+    width,
+    height,
+    0,
+    0,
+    scaledWidth,
+    scaledHeight
+  );
+
+  // Save as PNG
+  const dataURL = scaledCanvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = dataURL;
+  a.download = "doodlebase-creation.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+saveAsFileBtn.addEventListener("click", saveCanvasAsPNG);
+
+async function copyCanvasToClipboard(maxWidth = 1200) {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const compositeCanvas = document.createElement("canvas");
+  compositeCanvas.width = width;
+  compositeCanvas.height = height;
+  const ctx = compositeCanvas.getContext("2d");
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(
+    riveCanvas,
+    0,
+    0,
+    riveCanvas.width,
+    riveCanvas.height,
+    0,
+    0,
+    width,
+    height
+  );
+  ctx.drawImage(
+    drawCanvas,
+    0,
+    0,
+    drawCanvas.width,
+    drawCanvas.height,
+    0,
+    0,
+    width,
+    height
+  );
+
+  // Scale down if necessary
+  let scale = 1;
+  if (width > maxWidth) scale = maxWidth / width;
+  const scaledWidth = width * scale;
+  const scaledHeight = height * scale;
+
+  const scaledCanvas = document.createElement("canvas");
+  scaledCanvas.width = scaledWidth;
+  scaledCanvas.height = scaledHeight;
+  const scaledCtx = scaledCanvas.getContext("2d");
+
+  scaledCtx.drawImage(
+    compositeCanvas,
+    0,
+    0,
+    width,
+    height,
+    0,
+    0,
+    scaledWidth,
+    scaledHeight
+  );
+
   try {
     const blob = await new Promise((res) =>
-      compositeCanvas.toBlob(res, "image/png")
+      scaledCanvas.toBlob(res, "image/png")
     );
-    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-    showSnackbar("✅ Copied to clipboard!");
+
+    // Attempt to copy image to clipboard
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      showSnackbar("✅ Copied to clipboard!");
+    } else {
+      throw new Error("Clipboard API not supported.");
+    }
   } catch (err) {
-    console.error("Clipboard error:", err);
-    alert("Copy failed.");
+    console.warn("Clipboard copy failed, using fallback:", err);
+
+    // Fallback: trigger image download instead
+    const dataURL = scaledCanvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataURL;
+    a.download = "doodlebase-creation.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    showSnackbar("⚠️ Copied failed, image downloaded instead.");
   }
 }
 
